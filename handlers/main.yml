@@ -1,0 +1,6 @@
+---
+# handlers file for test
+- name: restart_nexus
+  service:
+    name: nexus
+    state: restarted

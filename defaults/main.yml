@@ -1,0 +1,14 @@
+---
+# defaults file for test
+nexus_user:  
+nexus_group:  
+nexus_installation_dir: /opt
+nexus_version: 3.25.1-04
+nexus_data_dir: /data
+nexus_port: 7009
+nexus_min_memory: 2703
+nexus_max_memory: 2703
+nexus_direct_memory: 2703
+nexus_host: 0.0.0.0
+nexus_log_dir: /var/log/nexus
+nexus_tmp_dir: "{{ nexus_data_dir }}/tmp"

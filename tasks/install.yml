@@ -1,0 +1,78 @@
+---
+- name: Download and unpack the nexus
+  unarchive:
+    src: "http://download.sonatype.com/nexus/3/nexus-{{ nexus_version }}-unix.tar.gz"
+    dest: "{{ nexus_installation_dir }}"
+    creates: "{{ nexus_installation_dir }}/nexus-{{ nexus_version }}"
+    remote_src: yes
+    owner: "{{ nexus_user }}"
+    group: "{{ nexus_group }}"
+    mode: "0755"
+
+- name: copy vmoptions file
+  template:
+    src: nexus.vmoptions.j2
+    dest: "{{ nexus_installation_dir }}/nexus-{{ nexus_version }}/bin/nexus.vmoptions"
+  notify:
+    - restart_nexus
+
+- name: copy user file
+  template:
+    src: nexus.rc.j2
+    dest: "{{ nexus_installation_dir }}/nexus-{{ nexus_version }}/bin/nexus.rc"
+  notify:
+    - restart_nexus
+
+- name: copy port conf file
+  template:
+    src: nexus-default.properties.j2
+    dest: "{{ nexus_installation_dir }}/nexus-{{ nexus_version }}/etc/nexus-default.properties"
+  notify:
+    - restart_nexus
+
+- name: copy service file
+  template:
+    src: nexus.service.j2
+    dest: /etc/systemd/system/nexus.service
+    owner: root
+    group: root
+    mode: 0755
+
+- name: copy service file
+  template:
+    src: logback.xml.j2
+    dest: "{{ nexus_installation_dir }}/nexus-{{ nexus_version }}/etc/logback/logback.xml"
+  notify:
+    - restart_nexus
+    
+- name: Set file permissions
+  file:
+    dest: "{{ nexus_installation_dir }}/nexus-{{ nexus_version }}"
+    owner: "{{ nexus_user }}"
+    group: "{{ nexus_group }}"
+    mode: 0755
+    recurse: true
+
+- name: Nexus service daemon-reload
+  systemd:
+    name: nexus
+    daemon-reload: true
+
+- name: Enable nexus service on startup
+  service:
+    name: nexus
+    enabled: true
+    state: started
+
+- name: Waiting for service to start
+  wait_for:
+    path: "{{ nexus_data_dir }}/admin.password"
+    delay: 10
+
+- name: get admin password 
+  shell: cat {{ nexus_data_dir }}/admin.password
+  register: admin_password
+
+- debug:
+    msg: "Admin password is - {{ admin_password.stdout }}"
+  

@@ -1,0 +1,26 @@
+---
+- name: service group
+  group:
+    name: "{{ nexus_group }}"
+    state: present
+
+- name: service user
+  user:
+    name: "{{ nexus_user }}"
+    group: "{{ nexus_group }}"
+    state: present
+    shell: /bin/bash 
+    create_home: true
+
+- name: ensure directory exists
+  file:
+    dest: "{{ item }}"
+    state: directory
+    owner: "{{ nexus_user }}"
+    group: "{{ nexus_group }}"
+    mode: 0775
+    recurse: true
+  with_items:
+    - "{{ nexus_data_dir }}"
+    - "{{ nexus_log_dir }}"
+    - "{{ nexus_tmp_dir }}"

@@ -1,0 +1,35 @@
+---
+- name: wait for the server to to be UP.
+  wait_for_connection:
+    connect_timeout: 10
+    sleep: 5
+    delay: 5
+    timeout: 300
+
+- name: gather facts
+  setup:
+    gather_subset:
+    - '!all'
+    - '!any'
+    - network
+    - hardware
+    
+- name: check Java version
+  raw: java -version 2>&1 | grep version | awk '{print $3}' | awk -F"_" '{print $1}'| sed 's/"//g'
+  changed_when: true
+  register: java_version_check
+
+- name: Print message if correct version of java is not installed
+  fail:
+    msg: "java version is not compatible."
+  when: (java_version_check.stdout < "1.8")
+
+- name: install java version
+  yum: 
+    name: java-1.8.0-openjdk.x86_64
+    present: yes
+  when: java_version_check.rc!=0 
+
+- include: pre-requisite.yml
+
+- include: install.yml
