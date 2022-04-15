@@ -1,6 +1,6 @@
 ---
 - hosts: all
   roles:
-    - Nexusrole\Nexus_Role
+    - Nexusrole/Nexus_Role
 
    
