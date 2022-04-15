@@ -1,7 +1,7 @@
 ---
 # defaults file for test
-nexus_user:nexus  
-nexus_group:nexus  
+nexus_user: nexus  
+nexus_group: nexus  
 nexus_installation_dir: /opt
 nexus_version: 3.25.1-04
 nexus_data_dir: /data
